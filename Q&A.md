@@ -19,4 +19,23 @@ Asset
 Bundle
  - Dependencies
 ```
-加载 Dependencies 的时候没有递归,不会死循环。是通过分层处理的，依赖关系放到 Asset 层，不是放到 Bundle 层。xasset的设计是 Bundle 自身没有依赖，Asset 有依赖，用 Asset 管理依赖，而不是用 Bundle 管理依赖，你看看 Bundle 类，有持有 Dependencies 么？分层就是不用 Bundle 管理依赖，因为依赖在 Bundle 层，天生有循序依赖，而依赖在 Asset 层，天生没有循环依赖。
+加载 Dependencies 的时候没有递归,不会死循环。是通过分层处理的，依赖关系放到 Asset 层，不是放到 Bundle 层。xasset的设计是 Bundle 自身没有依赖，Asset 有依赖，用 Asset 管理依赖，而不是用 Bundle 管理依赖，你看看 Bundle 类，有持有 Dependencies 么？分层就是不用 Bundle 管理依赖，因为依赖在 Bundle 层，天生有循序依赖，而依赖在 Asset 层，天生没有循环依赖。  
+
+Q : 请问怎么批量加载？  
+A : 你对批量加载如何定义呢?onebyone 还是 并行？这都是在业务层控制的。  
+```C#
+foreach(var asset : assets) {
+    var asset = Asset.Load(asset, assetType);
+    yield return asset; 
+}
+```
+上面这种是这是 onebyone 加载。  
+```C#
+var assets = new List<Asset>();
+foreach(var path in assetPaths) {
+    assets.Add(Asset.LoadAsync(path, type));
+}
+yield return new WaitForComplete(assets.TrueForAll(a => a.isDone));
+```
+这种写法是异步并行加载。  
+![](./images/4.png)  
