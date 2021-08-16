@@ -21,7 +21,7 @@ Bundle
 ```
 加载 Dependencies 的时候没有递归,不会死循环。是通过分层处理的，依赖关系放到 Asset 层，不是放到 Bundle 层。xasset的设计是 Bundle 自身没有依赖，Asset 有依赖，用 Asset 管理依赖，而不是用 Bundle 管理依赖，你看看 Bundle 类，有持有 Dependencies 么？分层就是不用 Bundle 管理依赖，因为依赖在 Bundle 层，天生有循序依赖，而依赖在 Asset 层，天生没有循环依赖。  
 
-Q : 请问怎么批量加载？  
+* Q : 请问怎么批量加载？  
 A : 你对批量加载如何定义呢?onebyone 还是 并行？这都是在业务层控制的。  
 ```C#
 foreach(var asset : assets) {
@@ -39,3 +39,11 @@ yield return new WaitForComplete(assets.TrueForAll(a => a.isDone));
 ```
 这种写法是异步并行加载。  
 ![](./images/4.png)  
+
+* Q : 请问怎么打android包，怎么把shader打进去？  
+A : 1.切换平台到 Android  
+2.Assets/Versions/Build/Player 或者 File/Build XXX 都能打包 Android 包  
+3.shader 分为两种，Unity 内部的配置到 allways include，其它的设置下 AssetBundle 名字  
+
+* Q : 请问打包到安卓手机上，3d物体是紫色的什么情况?  
+A : shader 没有打包，或者变体采集，还有兼容性问题。shader 的问题，用 FrameDebuger 很好定位  
