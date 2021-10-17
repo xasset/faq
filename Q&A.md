@@ -46,4 +46,22 @@ A : 1.切换平台到 Android
 3.shader 分为两种，Unity 内部的配置到 allways include，其它的设置下 AssetBundle 名字  
 
 * Q : 请问打包到安卓手机上，3d物体是紫色的什么情况?  
-A : shader 没有打包，或者变体采集，还有兼容性问题。shader 的问题，用 FrameDebuger 很好定位  
+  A : shader 没有打包，或者变体采集，还有兼容性问题。shader 的问题，用 FrameDebuger 很好定位  
+
+* Q:![](./images/5.jpg)
+
+  对于Build的Group拆分有什么建议吗？比如
+  1.打包后，对大小超过多少的AB进行拆分成按文件打包？
+  2.对于不同父节点的同名的文件夹如何处理？非PackTogether的情况下，Group.name是否可以重复？
+  3.哪类文件适合单独一个ab，例如scene、所有的Shader
+  4.在不修改当前Group的情况下，如何把Shader抽出来放到一个ab里(ustomPacker += CustomPacker实现)？
+
+  A:
+
+  1.prefab、场景 之类可以 按文件打包。贴图之类 可以按目录打包、一个bundle 建议控制在 5MB 以内
+
+  2.不同节点的同名的文件夹 不是 PackTogether 的 BundleMode 没影响。PackTogether 的建议不要重名，PackTogether 是根据 group.name 为采集的资源分配 ab。
+
+  3.prefab、scene 之类比较适合 一个文件一个 ab
+
+  4.不修改 Group 除了 CustomPacker 外还可以 修改资源目录实现 把shader 抽出来放到 一个 ab,shader 的最优打策略不是全部放到一个 ab,具体看项目体量了,所有资源都可以遵循 同时使用的 放到一起打包
