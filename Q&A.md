@@ -64,4 +64,67 @@ A : 1.切换平台到 Android
 
   3.prefab、scene 之类比较适合 一个文件一个 ab
 
-  4.不修改 Group 除了 CustomPacker 外还可以 修改资源目录实现 把shader 抽出来放到 一个 ab,shader 的最优打策略不是全部放到一个 ab,具体看项目体量了,所有资源都可以遵循 同时使用的 放到一起打包
+  4.不修改 Group 除了 CustomPacker 外还可以 修改资源目录实现 把shader 抽出来放到 一个 ab,shader 的最优打策略不是全部放到一个 ab,具体看项目体量了,所有资源都可以遵循 同时使用的 放到一起打包  
+
+* Q : split build with group和blac klis tmode没看懂  
+A:split 表示开启分包，基于 assetgroup 的配置，默认是白名单模式,
+就是配置了啥就把啥复制到安装包。  
+
+* Q : 这个黑名单模式有啥用？  
+A:黑名单就是配置了的不复制到安装包的意思  
+
+* Q : RawAsset是个啥概念?  
+A:RawAsset就是不打进Bundle的资产文件，比如.mp4的视频文件
+比如我这里有个.mp4文件,将它设置为了rawasset。打包的时候就是单纯地把他复制到StreamingAsset下 然后加载的时候用的是UnityWebRequest。  
+![](./images/6.png)  
+
+* Q : assetgroup可以多个asset下一级目录打成一个bundle吗?build我理解是一种打所有bundle的方式,分包时是使用assetgroup而不是build是为啥？  
+A:assetgroup 不是用来打 bundle 的,只是给 bundle 中的资源指定一个预定义的分组配置。这个分组配置在 demo 中用到了自定义安装包资源 和 按需更新上。  
+Build 的 Group 用来采集要打包的资源，AssetGroup 用来定义 安装包中 需要包含的资源，另外 在运行时也用来 进行局部内容更新。  
+
+* Q : 您好请问这个打出来的.bin是什么作用呢？为什么会有400M这么大呢？这个是压缩包的作用吗？进入游戏解压成ab？  
+![](./images/7.png)  
+A:bin是把所有的bundle合并到了一个block中,游戏中是直接按照偏移量去从这个bin文件中读取bundle的。文档中加密那一节有说这个，这个可以防止资源被轻易地解密、反向。  
+对一个Build文件勾选pack binary以后，会在打Bundle的时候，把这个Build中包含的Bundle合并在一起放进一个同名的bin文件中，比如Art这个Build就会生成Art.bin，也就是你截图的那个。目前这个生成的跟Build同名的bin没有直接在游戏中使用到，是为了以后可以把某些模块的内容合并后一次更新下来 减少Http的IO，也就是下载一个大文件而不是多个小文件。  
+勾选Setting中的BinaryMode：  
+![](./images/8.png)  
+这个会把所有的ab按照偏移量的方式，合并进一个大的名为data.bin的文件中，目前安装包加密是读取的data.bin这个，Build里的pack binary目前不开启不影响文档中所说的安装包加密功能。  
+目前是所有的Bundle合并为一个data.bin，这块的代码在BuildScript.CopyToStreamingAssets这个函数里面实现的。  
+
+* Q : 所有的Bundle都合并进data.bin的话是不是就没法做分包了呢？
+A:安装包的bin是先分包后合并的。  
+
+* Q : 请问build文件没有md5码，下载更新会不会有缓存问题?
+A:有带 hash 的版本,example 里面的代码写了注释,正式环境使用 带 hash 的版本,如：Arts_v1_XXX。  
+流程是这样的：  
+1.打包，打完后把带 hash 的最新的配置文件上传到控制服后台  
+2.客户端启动的时候 和 控制服 通信 获取这个带 hash 的配置文件  
+
+* Q : 我在AssetGroup中只填Bundle中的其中一个Asset，调用GetDownloadSizeAsync(group)会返回包含这个Asset的整个Bundle对吧？  
+A:会包含依赖,也是说我不用把Bundle里的每个Asset都配到AssetGroup里就可以达到下载整个Bundle或者让这个Bundle留在包体里的目的。另外，运行时的 AssetPath 其实有可能会随着角色的成长发生变化，所以 运行时可以不用 AssetGroup。  
+例如，MMO 游戏中，同一个场景，老号和新号 需要的资源是不一样的，运行时根据角色数据 获取需要更新的资源 这个是最优的方式。xasset 在底层会自动处理依赖关系。  
+
+* Q : 请问 现在version文件放在Application.temporaryCachePath这个目录，比较疑惑 如果清理缓存的话，会不会重新下载资源，还是基于有其他什么目的？  
+A:临时目录保存的是临时文件;持久化目录保存的是正式文件  
+
+* Q : 请问开启了binarymode后生成的data.bin是怎么用的呢？这个文件是留在包里还是放到cdn呢？  
+A:打安装包会自动处理,不用上cdn。  
+
+* Q : 那下载下来的ab是不是就没有加密功能了？  
+A:下载的ab要分包就不能加密,不能用 现有的这种最高效的方案加密,边玩边下的时候天生会出现异常。  
+
+* Q : 这三个选项是什么意思啊?  
+![](./images/9.png)  
+A:  
+Filter： 筛选,Filter 可以文档有描述  
+Active: 启用  
+Handle Dependencies 开启处理依赖，不带依赖的资源例如贴图，不勾选可以加快打包速度。  
+
+* Q :  这个是什么样一个对应关系啊？  
+![](./images/10.png)  
+A:BuildPlayerConfigIndex 决定 生效的配置，Preload、Completed、Empty 是预定义的安装包资源分组。  
+
+* Q : 跑 7.0 example 里的 splash scene , PreloadManager 单例为空  
+A:  
+1.切换成 仿真模式跑  
+2.打包后 切换为 预加载或者增量模式跑
