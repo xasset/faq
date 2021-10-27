@@ -130,6 +130,7 @@ A:
 
 * Q : 生成的ab有1.5个G,但是最终生成的APK只有270MB，这是怎么回事？  
 A:可能是分包导致的，Settings.PlayerConfigs的BuildPlayerConfigIndex设置，当BuildPlayerConfigIndex设置为0的时候，只有 Preload 部分的资源 Copy 到 StreamingAssets 了，分包机制生效了。在这种情况下，如果要打出整包，把BuildPlayerConfigIndex设置为1就可以。  
+![](./images/11.png)  
 
 * Q : maxbandwidth 是限速用的吗？  
 A:是的  
