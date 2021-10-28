@@ -134,3 +134,12 @@ A:可能是分包导致的，Settings.PlayerConfigs的BuildPlayerConfigIndex设�
 
 * Q : maxbandwidth 是限速用的吗？  
 A:是的  
+
+* Q : 请问Group.asset 是另一个维度对资源的划分是嘛？  
+A:AssetGroup.asset 是预定义的资源分组，算是另一个维度的，主要用来分包，以及 指定运行时需要 进行更新检查的资源（这个不是必须的）。example 用了 AssetGroup.asset 指定运行时局部更新的内容。  
+
+* Q : Build.asset我已经按照分包下载的内容来划分了多个bundle， 如果还要在AssetGroup里根据不同功能罗列prefab和资源， 工作量比较大和有一定重复性。请问现在有对bundle的分组嘛？  
+A:build 的 group 不应该 和 assetgroup 产生关系,build 决定资源的打包粒度,assetgroup 只是用来配置某一个时刻需要使用的资源,这是两个不同维度的东西。另外如果是 mmo，运行时 需要使用的资源可能会随角色等级变化而变化，这个时候动态组装资源路径比预定义更灵活、更准确。  
+
+* Q : 还有个问题， 自动依赖我试了下会汇总到一个auto包下?  
+A:这个是主动为未设置分组的资源,分配一个分组,可以避免打包冗余。  
