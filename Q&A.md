@@ -143,3 +143,15 @@ A:build 的 group 不应该 和 assetgroup 产生关系,build 决定资源的打
 
 * Q : 还有个问题， 自动依赖我试了下会汇总到一个auto包下?  
 A:这个是主动为未设置分组的资源,分配一个分组,可以避免打包冗余。  
+
+* Q : 现在我们这边打bundle有一个需求，图集文件夹AtlasGroup希望能按照单个文件byfile打，其余的group希望按照together的方式打，我该怎么去设置build？  
+A:BundleMode.PackByFile 就是按 file 打,Build 可以添加 n 个 Group,每个 Group 都有独立的 BundleMode。  
+
+* Q : 一个ab对应一个group还是可以多个ab对应一个group？  
+A:group 决定 对应资源 分配 到 ab 的粒度:
+>* byfile = 每个资源 一个 ab  
+>* together = 所有打包到 一个 ab  
+>* by dir = 同一个目录的 一个 ab  
+>* by top dir = 一级子目录的一个 ab  
+一般 prefab 是 prefab 都放到一个 目录下，然后对 root 添加 一个 group，用 packByFile就好了。不用 每个文件夹都 创建一个 Group，Build 提供了一种 批处理的 采集资源 分配 bundle 的方式，带依赖的资源 勾选 Handle Dependenices，例如 prefab、scene、animation 之类，不带依赖的资源 例如 text texture audio video 等 可以不用勾选 HandleDependencies。  
+
