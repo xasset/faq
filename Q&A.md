@@ -155,3 +155,6 @@ A:group 决定 对应资源 分配 到 ab 的粒度:
 >* by top dir = 一级子目录的一个 ab  
 一般 prefab 是 prefab 都放到一个 目录下，然后对 root 添加 一个 group，用 packByFile就好了。不用 每个文件夹都 创建一个 Group，Build 提供了一种 批处理的 采集资源 分配 bundle 的方式，带依赖的资源 勾选 Handle Dependenices，例如 prefab、scene、animation 之类，不带依赖的资源 例如 text texture audio video 等 可以不用勾选 HandleDependencies。  
 
+* Q : XAsset目前对Google PAD的集成支持on-demand的模式么，我看文档上只提到了 install-time  
+A : 支持,可以混用。on-demand 和 fast-follow 都是 从 assetPack 读取 bundle，打包 的时候自己分配 好 对应的 bundle 的 分发模式就好。  
+
