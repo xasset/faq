@@ -158,3 +158,6 @@ A:group 决定 对应资源 分配 到 ab 的粒度:
 * Q : XAsset目前对Google PAD的集成支持on-demand的模式么，我看文档上只提到了 install-time  
 A : 支持,可以混用。on-demand 和 fast-follow 都是 从 assetPack 读取 bundle，打包 的时候自己分配 好 对应的 bundle 的 分发模式就好。  
 
+* Q : 预加载和增量模式，这两个是要在windows平台下用吗？Android平台打出来的shader用不了  
+A:真机默认增量模式,shader在android平台的编辑器下显示紫色是正常的。可以修改编辑器图形api，把 dx 改成 opengl。  
+
