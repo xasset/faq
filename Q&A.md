@@ -161,3 +161,11 @@ A : 支持,可以混用。on-demand 和 fast-follow 都是 从 assetPack 读取 
 * Q : 预加载和增量模式，这两个是要在windows平台下用吗？Android平台打出来的shader用不了  
 A:真机默认增量模式,shader在android平台的编辑器下显示紫色是正常的。可以修改编辑器图形api，把 dx 改成 opengl。  
 
+* Q : 现在setting里配置两种group， 一个是空包和一个是带了部分资源的， buildPlayerConfigIndex指定了带部分资源的这个group，所有资源我已经上传到本地服务器，真机打包出来都是正常的，但unity编辑器切换成 Incremental 模式就会提示FileNotFoundException。  
+A : 编辑器中测试增量模式，先执行下CopyToStreamingAssets。增量模式下，资源从 StreamingAssets 加载。  
+
+* Q : 如果我Build Player Config Index 指定为空的group， 这种情况也能模拟不？  
+A : 可以，example 的 Startup 有个 autoUpdate 的选项，加载前只要装载了清单和配置好下载地址，资源服务器上有资源，本地没有的都会去服务器加载。  
+
+* Q : 我现在也仿照 Startup 写了一个初始化脚本， 处理空包首次自动下和非空包只更新版本文件。只是updateAsync.Override()的时机现在不是很清楚， 虽然有注释。  
+A ： Override 是业务之前有的客户说需要用旧版本的资源跑，example 里面有个对话框，让用户选择是否覆盖，用新版本的资源覆盖旧版本。不 Override 的时候，新的清单不会生效，Override 后新的清单才会生效。你的这两种情况其实就应该是都Override，哪怕不强制更新， 进入游戏后触发某个有资源更新的功能的时候， 就会弹资源更新提示框。
