@@ -169,4 +169,15 @@ A : 编辑器中测试增量模式，先执行下CopyToStreamingAssets。增量�
 A : 可以，example 的 Startup 有个 autoUpdate 的选项，加载前只要装载了清单和配置好下载地址，资源服务器上有资源，本地没有的都会去服务器加载。  
 
 * Q : 我现在也仿照 Startup 写了一个初始化脚本， 处理空包首次自动下和非空包只更新版本文件。只是updateAsync.Override()的时机现在不是很清楚， 虽然有注释。  
-A ： Override 是业务之前有的客户说需要用旧版本的资源跑，example 里面有个对话框，让用户选择是否覆盖，用新版本的资源覆盖旧版本。不 Override 的时候，新的清单不会生效，Override 后新的清单才会生效。你的这两种情况其实就应该是都Override，哪怕不强制更新， 进入游戏后触发某个有资源更新的功能的时候， 就会弹资源更新提示框。
+A ： Override 是业务之前有的客户说需要用旧版本的资源跑，example 里面有个对话框，让用户选择是否覆盖，用新版本的资源覆盖旧版本。不 Override 的时候，新的清单不会生效，Override 后新的清单才会生效。你的这两种情况其实就应该是都Override，哪怕不强制更新， 进入游戏后触发某个有资源更新的功能的时候， 就会弹资源更新提示框。  
+
+* Q : 发现下载的不是manifest里面全部的资源，而是load了哪些，才下载哪些。有全量下载的接口吗？  
+A : 不传 = 所有。Versions.GetDownloadSizeAsyncWithManifest(manifestName) 可以获得一个模块的所有需要更新的资源。Versions.GetDownloadSizeAsync() 这个不传参数 = 获取所有模块需要更新的资源。  
+
+* Q ： 因为 bundle 包后续都要放到cdn上面，Art.version、Art manifest 的链接怎么自定义呀。  
+1.通过接口获取最新的Art.version，比如 http://cdn.xinxiang.com/ab/version  
+2.得到最新的Artmanifest，比如 Art.0.1  http://cdn.xinxiang.com/ab/art_1.0.1.manifest  
+3.最后下载相应资源  
+A : 这里是控制服逻辑，客户端和控制服通信获取最新的 art_1.0.1 。打包的时候把这个art_1.0.1发给控制服。Versions.UpdateAsync()的参数用控制服返回的。
+控制服要你们自己做，没有的话可以直接连接服务器，把游戏服用作控制服。  
+
