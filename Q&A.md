@@ -181,3 +181,7 @@ A : 不传 = 所有。Versions.GetDownloadSizeAsyncWithManifest(manifestName) �
 A : 这里是控制服逻辑，客户端和控制服通信获取最新的 art_1.0.1 。打包的时候把这个art_1.0.1发给控制服。Versions.UpdateAsync()的参数用控制服返回的。
 控制服要你们自己做，没有的话可以直接连接服务器，把游戏服用作控制服。  
 
+* Q : 有没有判断资源是否存在的这种接口？开发时，有时候美术的资源没做完，想做到只播放做完的特效。
+现在是直接load报错然后判断null就不播了  
+A :  IsDownloaded 可以判断本地是否有这个资源，这个编辑器和运行时都能用。可以根据资源路径判断资源和资源的依赖是否在本地。  
+![](./images/13.png)
