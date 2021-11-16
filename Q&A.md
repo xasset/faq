@@ -205,3 +205,25 @@ A : 是的，腾讯云用 cos 上传新增的文件就好。新增的文件可�
 
 Q :  我把prefab的bundle规则从按子功能文件夹改为按单个文件， 总bundle大小增加了30MB 左右， 这样是值得嘛?  
 A : 值得啊，不过增加 30 MB 要看你们多少Prefab，prefab 按文件打包可以按需加载，为运行时的加载和热更提供按需处理的根基。同时使用的 prefab 可以打包到一起，不是同时使用的 prefab 都 packByfile。是否打包到一起取决与资源使用的时机，一切都是为了更小的运行时更新成本和IO成本，安装包的大小和数量是最后考虑的。  
+
+Q : 多个build文件中有资源相互引用会有问题。现在游戏中场景中引用视频资源，这时打包时会单独生成一个公共的视频资源ab，而没有引用视频build下的ab资源。  
+A : build和build 之间的资源应该相互独立。  
+
+Q : 卸载xasset及资源该如何处理？不影响二次初始化的情况下  
+A : 这四行代码调用下就好了,另外业务层的缓存都要清掉,上面3行是清底层的缓存,第四行是真正回收资源。  
+```C#
+Asset.Cache.Clear();
+Bundle.Cache.Clear();
+RawAsset.Cache.Clear();
+AssetBundle.UnloadAllAssetBundles(true); 
+```  
+
+Q : 现在打包 auto group 默认的是 PackByDirectory，这样2个prefab依赖的资源在一个目录的话，会打到一个包里面去，这个加载是不是会造成内存的浪费，卸载也会由于依赖导致卸载不掉  
+A : 同时使用的资源pack到一起，主要引用计数正常就能释放。  
+
+Q : 同时使用的资源pack到一起,这个一般是怎么来划分的?放到一个目录吗?还有assetsbundle粒度大小一般怎么控制?
+我们现在3000多个文件 1.4G 正常吗?  
+A : 游戏中同时出现在屏幕的放到一个目录，默认 xasset 通过 BundleMode 控制打包粒度，另外提供了 customPacker，bundle的粒度取决于bunlde的名字，xasset 打包后 buildpath 会保留上一个版本的构建数据。  
+
+Q : Download length 2552377 mismatch to 2552378。这个下载报错是什么原因呢？我检查本地bundle的crc和cdn上的一致的，有可能是上传环节文件变化吗？  
+A : 文件长度不匹配，你看清单的大小和本地文件的大小是否一致，再对比cdn的，如果cdn的不一样，这就是上传环节出现异常了。
