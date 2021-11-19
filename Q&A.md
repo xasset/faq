@@ -226,4 +226,19 @@ Q : 同时使用的资源pack到一起,这个一般是怎么来划分的?放到�
 A : 游戏中同时出现在屏幕的放到一个目录，默认 xasset 通过 BundleMode 控制打包粒度，另外提供了 customPacker，bundle的粒度取决于bunlde的名字，xasset 打包后 buildpath 会保留上一个版本的构建数据。  
 
 Q : Download length 2552377 mismatch to 2552378。这个下载报错是什么原因呢？我检查本地bundle的crc和cdn上的一致的，有可能是上传环节文件变化吗？  
-A : 文件长度不匹配，你看清单的大小和本地文件的大小是否一致，再对比cdn的，如果cdn的不一样，这就是上传环节出现异常了。
+A : 文件长度不匹配，你看清单的大小和本地文件的大小是否一致，再对比cdn的，如果cdn的不一样，这就是上传环节出现异常了。  
+
+Q : 改了文件夹名字后，加载识别不了。这个路径是对的FileNotFoundException assets/resourcesex/mobile/ui/uiroot.prefab。Unity重启也没用,是要重新配置吗?  
+A : FileNotFound 表示清单里面找不到，或者清单没有装载。清单是在初始化时加载的，在打包后生成的。  
+
+Q : 我们今天出包遇到一个问题，build配置文件记录的大小和下载下来的大小不一致，用浏览器下载下来的大小看着是正确的，这个可能是啥原因呢？  
+![](./images/19.png)  
+A : 你们是固定设备固定工程出包么，没有 clear 过打包后的数据。  
+> Q ：会回滚git，library不会动。  
+> A : Bundle不能动。  
+> Q : Bundles 进入版本管理了么?  
+> A : 没有，现在的策略是同一个版本打包的时候来bundles会管理，升版本需要整包更新的话，bundles会重新打。  
+> A : 你们和另外一个用你们这种方式进行版本管理的团队都出了类似问题。  
+A : 
+1.Bundles 不管是否升版本,都要保留不要删除。随着版本迭代，bundles会越来越大，遇到这种情况，Bundles 编辑器有提供 ClearHistory 的接口，可以只保留 当前版本的数据。  
+2.服务器其实不用为每个版本单独创建一个目录，你们的cdn的目录结构感觉是老式的做法，version/platform/bundles 这样，xasset 7 其实是可以把version那层去掉。  
