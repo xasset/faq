@@ -265,3 +265,43 @@ Q : 我发现后缀名为.proto和.c的文件无法读取，显示加载失败�
 A : Unity 不能识别这个文件,以下是Unity支持读取的文本格式：  
 ![](./images/20.png)  
 
+Q : 有个疑问。现有的加载策略前提下。有这样的一个需求，不知道是否支持？还是说想要自行修改代码。
+出真机的debug包，允许运行时读脚本的时候，优先读取指定文件夹文件。然后在是当前加载策略。  
+A : xasset 加载和预加载都是根据业务调用按需处理，可以预加载局部内容。  
+
+Q : 咨询一下，随着版本的更新，无用的历史ab包如何清理？  
+A : 编辑器有 Versions/ClearHistroy 菜单，运行时有个 Versions.ClearAsync 接口。  
+
+Q : 这两天在集成FGUI，不知道xasset应该怎么和它打交道。请问有现成的解决方案么？  
+A : 参考这个：https://www.lfzxb.top/et-fguiandxasset/#%E9%80%82%E9%85%8Dfgui  
+
+Q : 我这边目前罗列了几个问题  
+1. BuildPlayerConfigIndex 为0， 为什么打包的时候把两个Group 都打出来了 
+2. Split Build With Group 的作用？ 
+3. 黑名单模式的作用? 
+4. Offline Mode使用场景？ 
+5. Binary Mode使用场景? 
+6. 热更新流程中， 下载完后如何区分哪些下载的资源是原始资源文件，从而调用解压接口. 
+7. 多线程下载并发控制与限速接口是哪个？ 
+8. 分布打包流程或配置是怎么样的？ 是否是不同的机器调用不同的Build文件 
+9. 不同的分包策略 是否由不同的Group维护？ 一个符合xasset 的分包策略是什么样的 
+10. Bundle 加密如何开启   
+
+A : 
+1. BuildPlayerConfigIndex 表示打包安装包的是要启用的分包配置
+2. SplitBuildWithGroup 表示使用当前分包配置指定的资源对安装包的资源进行切割；
+3. 默认分包配置中采集资源是白名单，包含了的才采集，黑名单表示，采集包含了的以外的；
+4. OfflineMode 可以在 iOS 提审之类的 case 使用，可以一键关闭 更新，具体看你们自己的需要；
+5. Android 可以开启 BinaryMode，开启后资源会加密；
+6. 默认热更的资源都是离散文件。不用解压。
+7. 最大并发数量 Download.maxDownloads, 限速 DownloadMaxBandwitdh;
+8. 分布式打包通过 Build 来分批次提交资源，不同 Build 直接的资源不能有交叉引用。同一个 Build 的要用同一个机器打包。
+9. 不同分包的资源通过 PlayerConfig 预定义  
+10. 参考回答4  
+
+Q : 我按照刚才的思路做了一次不同组的打包，然而我发现 BuildBundle 时会将所有的 Build配置的Bundle全部打包， 即使他们没有被PlayerConfigs 引用。执行Build Player 同理即使Group里没有这个Build配置也被放到了StreamingAssets中是我哪里操作的不对吗？  
+![](./images/21.png)  
+![](./images/22.png)  
+![](./images/23.png)  
+A : 不勾选 SplitBuildWithGroup = 所有。无场景包的配置应该勾选，你看下 example 的配置，Preload 是部分资源。  
+
